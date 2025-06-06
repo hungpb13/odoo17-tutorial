@@ -4,6 +4,11 @@
         <field name="model">estate.property</field>
         <field name="arch" type="xml">
             <form>
+               <header>
+                    <button name="action_set_sold" string="Sold" type="object" class="btn-primary"/>
+                    <button name="action_set_canceled" string="Cancel" type="object" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" readonly="1"/>
+                </header>
                 <sheet>
                     <group>
                         <field name="name"/>
@@ -48,9 +53,11 @@
                                 <tree editable="bottom">
                                     <field name="price"/>
                                     <field name="partner_id"/>
-                                    <field name="status"/>
                                     <field name="validity"/>
                                     <field name="date_deadline"/>
+                                    <button name="action_accept" string="Accept" type="object" icon="fa-check"/>
+                                    <button name="action_refuse" string="Refuse" type="object" icon="fa-times"/>
+                                    <field name="status"/>
                                 </tree>
                             </field>
                         </page>
@@ -78,101 +85,6 @@
                 <field name="selling_price"/>
                 <field name="date_availability"/>
                 <field name="total_area"/>
-            </tree>
-        </field>
-    </record>
-    <record id="view_estate_property_search" model="ir.ui.view">
-        <field name="name">estate.property.search</field>
-        <field name="model">estate.property</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="name"/>
-                <field name="postcode"/>
-                <field name="expected_price"/>
-                <field name="bedrooms"/>
-                <field name="living_area"/>
-                <filter string="With Garden" name="has_garden" domain="[('garden', '=', True)]"/>
-                <filter string="Available" name="available" domain="['|', ('state', '=', 'new'), ('state', '=', 'offer_received')]"/>
-            </search>
-        </field>
-    </record>
-
-    <record id="view_estate_property_type_form" model="ir.ui.view">
-        <field name="name">estate.property.type.form</field>
-        <field name="model">estate.property.type</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <h1>
-                        <field name="name" placeholder="Name"/>
-                    </h1>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    <record id="view_estate_property_type_tree" model="ir.ui.view">
-        <field name="name">estate.property.type.tree</field>
-        <field name="model">estate.property.type</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="view_estate_property_tag_form" model="ir.ui.view">
-        <field name="name">estate.property.tag.form</field>
-        <field name="model">estate.property.tag</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <h1>
-                        <field name="name" placeholder="Name"/>
-                    </h1>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    <record id="view_estate_property_tag_tree" model="ir.ui.view">
-        <field name="name">estate.property.tag.tree</field>
-        <field name="model">estate.property.tag</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-            </tree>
-        </field>
-    </record>
-
-    <!-- Form View for Property Offer -->
-    <record id="view_estate_property_offer_form" model="ir.ui.view">
-        <field name="name">Property Offer Form</field>
-        <field name="model">estate.property.offer</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group>
-                        <field name="price"/>
-                        <field name="partner_id" required="1"/>
-                        <field name="status"/>
-                        <field name="validity"/>
-                        <field name="date_deadline"/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <!-- Tree View for Property Offer -->
-    <record id="view_estate_property_offer_tree" model="ir.ui.view">
-        <field name="name">Property Offer Tree</field>
-        <field name="model">estate.property.offer</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="price"/>
-                <field name="partner_id"/>
-                <field name="status"/>
-                <field name="validity"/>
-                <field name="date_deadline"/>
             </tree>
         </field>
     </record>

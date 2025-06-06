@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class EstateProperty(models.Model):
   _name = 'estate.property'
@@ -38,7 +39,7 @@ class EstateProperty(models.Model):
         ('offer_received', 'Offer Received'),
         ('offer_accepted', 'Offer Accepted'),
         ('sold', 'Sold'),
-        ('cancelled', 'Cancelled')
+        ('canceled', 'Canceled')
      ],
      required=True,
      copy=False,
@@ -57,14 +58,11 @@ class EstateProperty(models.Model):
         record.total_area = record.living_area + record.garden_area
 
   
-  @api.depends('property_offer_ids.status', 'property_offer_ids.price')
+  @api.depends('property_offer_ids.price')
   def _compute_best_offer(self):
      for record in self:
-        accepted_offers = record.property_offer_ids.filtered(lambda offer: offer.status == 'accepted')
-        if accepted_offers:
-            record.best_offer = max(accepted_offers.mapped('price'))
-        else:
-            record.best_offer = 0.0
+        best_offer = max(record.property_offer_ids.mapped('price'), default=0.0)
+        record.best_offer = best_offer
 
 
   @api.onchange('garden')
@@ -76,3 +74,19 @@ class EstateProperty(models.Model):
         else:
            record.garden_area = 0
            record.garden_orientation = False
+
+
+  def action_set_sold(self):
+     for record in self:
+        if record.state == 'canceled':
+           raise UserError("A canceled property cannot be set as sold.")
+        if not record.property_offer_ids.filtered(lambda offer: offer.status == 'accepted'):
+           raise UserError("A property cannot be set as sold without an accepted offer.")
+        record.state = 'sold'
+
+
+  def action_set_canceled(self):
+     for record in self:
+        if record.state == 'sold':
+           raise UserError("A sold property cannot be canceled.")
+        record.state = 'canceled'
