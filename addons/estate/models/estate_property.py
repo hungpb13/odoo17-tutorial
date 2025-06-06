@@ -1,0 +1,78 @@
+from odoo import models, fields, api
+
+class EstateProperty(models.Model):
+  _name = 'estate.property'
+  _description = 'Real Estate Property'
+
+  name = fields.Char(string='Title', required=True)
+  description = fields.Text(string='Description')
+  postcode = fields.Char(string='Postcode')
+  date_availability = fields.Date(
+    string='Available From',
+    copy=False,
+    default=lambda self: fields.Date.add(fields.Date.today(), days=90)
+  )
+  expected_price = fields.Float(string='Expected Price', required=True)
+  selling_price = fields.Float(string='Selling Price', readonly=True, copy=False)
+  bedrooms = fields.Integer(string='Bedrooms', default=2)
+  living_area = fields.Integer(string='Living Area (sqm)')
+  facades = fields.Integer(string='Facades')
+  garage = fields.Boolean(string='Garage')
+  garden = fields.Boolean(string='Garden')
+  garden_area = fields.Integer(string='Garden Area (sqm)')
+  garden_orientation = fields.Selection(
+      string='Garden Orientation',
+      selection=[
+          ('north', 'North'),
+          ('south', 'South'),
+          ('east', 'East'),
+          ('west', 'West')
+      ]
+  )
+  total_area = fields.Integer(string='Total Area (sqm)', compute='_compute_total_area', store=True)
+  active = fields.Boolean(string='Active', default=True)
+  state = fields.Selection(
+     string='Status',
+     selection=[
+        ('new', 'New'),
+        ('offer_received', 'Offer Received'),
+        ('offer_accepted', 'Offer Accepted'),
+        ('sold', 'Sold'),
+        ('cancelled', 'Cancelled')
+     ],
+     required=True,
+     copy=False,
+     default='new'
+  )
+  property_type_id = fields.Many2one('estate.property.type', string='Property Type', required=True)
+  property_tag_ids = fields.Many2many('estate.property.tag', string='Property Tags')
+  salesperson_id = fields.Many2one('res.users', string='Salesperson', default=lambda self: self.env.user)
+  buyer_id = fields.Many2one('res.partner', string='Buyer', copy=False)
+  property_offer_ids = fields.One2many('estate.property.offer', 'property_id', string='Property Offers')
+  best_offer = fields.Float(string='Best Offer', compute='_compute_best_offer', store=True)
+  
+  @api.depends('living_area', 'garden_area')
+  def _compute_total_area(self):
+    for record in self:
+        record.total_area = record.living_area + record.garden_area
+
+  
+  @api.depends('property_offer_ids.status', 'property_offer_ids.price')
+  def _compute_best_offer(self):
+     for record in self:
+        accepted_offers = record.property_offer_ids.filtered(lambda offer: offer.status == 'accepted')
+        if accepted_offers:
+            record.best_offer = max(accepted_offers.mapped('price'))
+        else:
+            record.best_offer = 0.0
+
+
+  @api.onchange('garden')
+  def _onchange_garden(self):
+     for record in self:
+        if record.garden:
+           record.garden_area = 10
+           record.garden_orientation = 'north'
+        else:
+           record.garden_area = 0
+           record.garden_orientation = False
