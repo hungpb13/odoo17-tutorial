@@ -6,3 +6,8 @@ class EstatePropertyTag(models.Model):
 
    name = fields.Char(string='Name', required=True)
    property_ids = fields.Many2many('estate.property', string='Properties')
+
+
+   _sql_constraints = [
+      ('unique_tag_name', 'UNIQUE(name)', 'The tag name must be unique.')
+   ]
