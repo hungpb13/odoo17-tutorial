@@ -15,8 +15,8 @@
                     </group>
                     <group>
                         <group>
-                            <field name="property_type_id" placeholder="Property Type"/>
-                            <field name="property_tag_ids" widget="many2many_tags" placeholder="Tags"/>
+                            <field name="property_type_id" placeholder="Property Type" options="{'no_create': True, 'no_edit': True}"/>
+                            <field name="property_tag_ids" widget="many2many_tags" placeholder="Tags" options="{'color_field': 'color'}"/>
                             <field name="date_availability"/>
                             <field name="postcode"/>
                         </group>

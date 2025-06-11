@@ -8,6 +8,7 @@
                     <h1>
                         <field name="name" placeholder="Name"/>
                     </h1>
+                    <field name="color"/>
                 </sheet>
             </form>
         </field>

@@ -6,6 +6,7 @@ class EstatePropertyTag(models.Model):
    _order = 'name'
 
    name = fields.Char(string='Name', required=True)
+   color = fields.Integer(string='Color')
    property_ids = fields.Many2many('estate.property', string='Properties')
 
 
