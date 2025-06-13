@@ -20,12 +20,14 @@
         <field name="name">Property Offer Tree</field>
         <field name="model">estate.property.offer</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree editable="bottom">
                 <field name="price"/>
                 <field name="partner_id"/>
-                <field name="status"/>
+                <field name="property_id"/>
+                <field name="property_type_id"/>
                 <field name="validity"/>
                 <field name="date_deadline"/>
+                <field name="status" invisible="1"/>
             </tree>
         </field>
     </record>

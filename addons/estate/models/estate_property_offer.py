@@ -24,6 +24,12 @@ class EstatePropertyOffer(models.Model):
 		inverse='_inverse_date_deadline',
 		store=True
 	)
+	property_type_id = fields.Many2one(
+    'estate.property.type', 
+    string='Property Type', 
+    related='property_id.property_type_id', 
+    store=True
+	)
 
 
 	_sql_constraints = [
