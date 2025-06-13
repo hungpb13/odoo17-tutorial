@@ -74,3 +74,13 @@ class EstatePropertyOffer(models.Model):
 			if record.status in ['accepted', 'refused']:
 				raise UserError("This offer has already been processed.")
 			record.status = 'refused'
+
+
+	@api.model
+	def create(self, vals):
+		# Tạo offer
+		offer = super().create(vals)
+		# Cập nhật state của property thành 'offer_received'
+		if offer.property_id and offer.property_id.state == 'new':
+				offer.property_id.state = 'offer_received'
+		return offer
