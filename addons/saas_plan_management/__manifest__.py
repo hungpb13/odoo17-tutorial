@@ -31,21 +31,21 @@ Module quản lý các gói dịch vụ SaaS bao gồm:
     """,
     'author': 'SaaS Development Team',
     'website': 'https://saas-platform.com',
-    'license': 'LGPL-3',
+    'license': 'LGPL-3',    
     'depends': [
         'base',
         'web',
         'mail',
         'portal',
-        'saas_customer_management',  # Liên kết với module customer management
-    ],    'data': [
+    ],
+    'data': [
         # Security
         'security/saas_plan_groups.xml',
         'security/ir.model.access.csv',
-          # Data
+        # Data
         'data/odoo_module_data.xml',
         'data/plan_template_data.xml',
-          # Views
+        # Views
         'views/saas_plan_views.xml',
         'views/odoo_module_views.xml',
         'views/plan_addon_views.xml',

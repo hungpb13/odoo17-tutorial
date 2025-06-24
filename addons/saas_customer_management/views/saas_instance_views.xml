@@ -31,11 +31,20 @@
                             <field name="subdomain"/>
                             <field name="full_url" widget="url"/>
                             <field name="database_id"/>
-                        </group>
-                        <group string="Customer &amp; Package">
+                        </group>                        
+                        <group string="Customer &amp; Package">                            
                             <field name="customer_id"/>
                             <field name="service_package_id"/>
+                            <field name="plan_id"/>
                             <field name="billing_cycle"/>
+                        </group>
+                        <group string="Plan Information" invisible="not plan_id">
+                            <field name="plan_name"/>
+                            <field name="plan_type"/>
+                            <field name="current_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
+                            <field name="plan_monthly_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
+                            <field name="plan_yearly_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
+                            <field name="plan_currency_id" invisible="1"/>
                         </group>
                     </group>
                     <group>
@@ -63,13 +72,16 @@
     <record id="view_saas_instance_tree" model="ir.ui.view">
         <field name="name">saas.instance.tree</field>
         <field name="model">saas.instance</field>
-        <field name="arch" type="xml">
-            <tree decoration-success="status == 'active'" 
+        <field name="arch" type="xml">            <tree decoration-success="status == 'active'" 
                   decoration-warning="status == 'trial'" 
                   decoration-danger="status in ('suspended', 'expired')"
-                  decoration-muted="status == 'terminated'">
+                  decoration-muted="status == 'terminated'">                
                 <field name="instance_name"/>
                 <field name="customer_id"/>
+                <field name="plan_id"/>
+                <field name="plan_type"/>
+                <field name="current_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
+                <field name="plan_currency_id" invisible="1"/>
                 <field name="status"/>
                 <field name="odoo_version"/>
                 <field name="service_package_id"/>
@@ -86,10 +98,10 @@
     <record id="view_saas_instance_search" model="ir.ui.view">
         <field name="name">saas.instance.search</field>
         <field name="model">saas.instance</field>
-        <field name="arch" type="xml">
-            <search>
+        <field name="arch" type="xml">            <search>
                 <field name="instance_name"/>
                 <field name="customer_id"/>
+                <field name="plan_id"/>
                 <field name="subdomain"/>
                 <field name="database_id"/>
                 <filter string="Active" name="active" domain="[('status', '=', 'active')]"/>
@@ -101,6 +113,7 @@
                 <group string="Group By">
                     <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
                     <filter string="Customer" name="group_customer" context="{'group_by': 'customer_id'}"/>
+                    <filter string="Plan" name="group_plan" context="{'group_by': 'plan_id'}"/>
                     <filter string="Service Package" name="group_package" context="{'group_by': 'service_package_id'}"/>
                     <filter string="Odoo Version" name="group_version" context="{'group_by': 'odoo_version'}"/>
                 </group>

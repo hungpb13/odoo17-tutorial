@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 import json
 
 class SaasPlan(models.Model):
@@ -9,6 +9,18 @@ class SaasPlan(models.Model):
     _description = 'SaaS Plan'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'sequence, name'
+    
+    def name_get(self):
+        """Custom name display"""
+        result = []
+        for plan in self:
+            name = plan.name
+            if plan.plan_type:
+                name += f" ({plan.plan_type.title()})"
+            if not plan.active:
+                name += " [Inactive]"
+            result.append((plan.id, name))
+        return result
 
     # Thông tin cơ bản
     name = fields.Char(
@@ -180,13 +192,8 @@ class SaasPlan(models.Model):
         help='Các add-on có thể mua thêm cho gói này'
     )    
     
-    # Quan hệ với customers (thông qua instances)
-    instance_ids = fields.One2many(
-        'saas.instance',
-        'plan_id',
-        string='Instances',
-        help='Các instance đang sử dụng gói này'
-    )
+    # Quan hệ với customers (thông qua instances)    # Note: instance_ids removed to avoid circular dependency
+    # Use instance_count computed field instead
     
     # Features
     multi_company_support = fields.Boolean(
@@ -233,10 +240,11 @@ class SaasPlan(models.Model):
         compute='_compute_addon_count',
         store=True    )
     
+    # Computed fields for statistics
     instance_count = fields.Integer(
         string='Instance Count',
         compute='_compute_instance_count',
-        store=True
+        help='Số lượng instances sử dụng plan này'
     )
     
     effective_monthly_price = fields.Monetary(
@@ -270,12 +278,17 @@ class SaasPlan(models.Model):
     
     @api.depends('addon_ids')
     def _compute_addon_count(self):
-        for plan in self:            plan.addon_count = len(plan.addon_ids)
-    
-    @api.depends('instance_ids')
-    def _compute_instance_count(self):
         for plan in self:
-            plan.instance_count = len(plan.instance_ids)
+            plan.addon_count = len(plan.addon_ids)
+    
+    def _compute_instance_count(self):
+        """Compute number of instances using this plan"""
+        for plan in self:
+            # Use lazy loading to avoid dependency issues
+            if 'saas.instance' in self.env:
+                plan.instance_count = self.env['saas.instance'].search_count([('plan_id', '=', plan.id)])
+            else:
+                plan.instance_count = 0
     
     @api.depends('monthly_price', 'yearly_price', 'quarterly_price')
     def _compute_effective_prices(self):
@@ -307,19 +320,23 @@ class SaasPlan(models.Model):
                 name += f" ({plan.plan_type.title()})"
             if not plan.active:
                 name += " [Inactive]"
-            result.append((plan.id, name))        
-            
+            result.append((plan.id, name))
         return result
     
     def action_view_instances(self):
         """Action to view instances using this plan"""
+        # Check if saas.instance model exists
+        if 'saas.instance' not in self.env:
+            raise UserError(_('SaaS Instance model is not available. Please install SaaS Customer Management module.'))
+        
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Plan Instances'),
+            'name': f'Instances using {self.name}',
             'res_model': 'saas.instance',
             'view_mode': 'tree,form',
             'domain': [('plan_id', '=', self.id)],
-            'context': {'default_plan_id': self.id}
+            'context': {'default_plan_id': self.id},
+            'target': 'current',
         }
     
     def action_view_modules(self):

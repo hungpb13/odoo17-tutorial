@@ -11,7 +11,8 @@
                     <field name="sequence" widget="handle"/>
                     <field name="name"/>
                     <field name="code"/>
-                    <field name="plan_type"/>                    <field name="monthly_price" widget="monetary"/>
+                    <field name="plan_type"/>
+                    <field name="monthly_price" widget="monetary"/>
                     <field name="yearly_price" widget="monetary"/>
                     <field name="max_users"/>
                     <field name="storage_limit_gb"/>
@@ -33,6 +34,11 @@
                         <field name="active" widget="boolean_toggle"/>
                     </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_instances" type="object" class="oe_stat_button" icon="fa-desktop">
+                                <field name="instance_count" widget="statinfo" string="Instances"/>
+                            </button>
+                        </div>
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only"/>
                             <h1><field name="name" placeholder="Plan Name"/></h1>
@@ -44,7 +50,8 @@
                                 <field name="plan_type"/>
                                 <field name="billing_cycle"/>
                                 <field name="sequence"/>
-                            </group>                            <group name="status">
+                            </group>
+                            <group name="status">
                                 <field name="currency_id"/>
                                 <field name="module_count"/>
                                 <field name="addon_count"/>
@@ -135,17 +142,6 @@
                                         <field name="is_required"/>
                                         <field name="active"/>
                                     </tree>
-                                </field>                            </page>
-                            
-                            <page string="Instances" name="instances">
-                                <field name="instance_ids" nolabel="1">
-                                    <tree>
-                                        <field name="instance_name"/>
-                                        <field name="customer_id"/>
-                                        <field name="subdomain"/>
-                                        <field name="status"/>
-                                        <field name="date_created"/>
-                                    </tree>
                                 </field>
                             </page>
                         </notebook>
@@ -170,7 +166,8 @@
                     <field name="plan_type"/>
                     <field name="monthly_price"/>
                     <field name="yearly_price"/>
-                    <field name="max_users"/>                    <field name="module_count"/>
+                    <field name="max_users"/>
+                    <field name="module_count"/>
                     <field name="instance_count"/>
                     <field name="active"/>
                     <templates>
@@ -192,7 +189,8 @@
                                             <li t-if="record.yearly_price.value">
                                                 <strong>Yearly:</strong> 
                                                 <field name="yearly_price" widget="monetary"/>
-                                            </li>                                            <li><strong>Max Users:</strong> <field name="max_users"/></li>
+                                            </li>
+                                            <li><strong>Max Users:</strong> <field name="max_users"/></li>
                                             <li><strong>Modules:</strong> <field name="module_count"/></li>
                                             <li><strong>Instances:</strong> <field name="instance_count"/></li>
                                         </ul>
@@ -247,8 +245,8 @@
                 <p>
                     Define service plans with pricing, limits, and included modules.
                 </p>
-            </field>
+            </field>        
         </record>
-        
+
     </data>
 </odoo>
