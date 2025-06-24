@@ -29,6 +29,7 @@ class SaasInstance(models.Model):
     # Quan hệ
     customer_id = fields.Many2one('saas.customer', string='Customer', required=True, ondelete='cascade')
     service_package_id = fields.Many2one('saas.service.package', string='Service Package', required=True)
+    plan_id = fields.Many2one('saas.plan', string='Plan')
     
     # Trạng thái và thời gian
     status = fields.Selection([
