@@ -36,7 +36,10 @@ class SaasInstance(models.Model):
     plan_type = fields.Selection(related='plan_id.plan_type', string='Plan Type', readonly=True)
     plan_currency_id = fields.Many2one(related='plan_id.currency_id', readonly=True)
     plan_monthly_price = fields.Monetary(related='plan_id.monthly_price', string='Monthly Price', currency_field='plan_currency_id', readonly=True)
+    plan_quarterly_price = fields.Monetary(related='plan_id.quarterly_price', string='Quarterly Price', currency_field='plan_currency_id', readonly=True)
     plan_yearly_price = fields.Monetary(related='plan_id.yearly_price', string='Yearly Price', currency_field='plan_currency_id', readonly=True)
+    plan_storage_limit_gb = fields.Float(related='plan_id.storage_limit_gb', string='Storage Limit (GB)', readonly=True)
+    plan_max_users = fields.Integer(related='plan_id.max_users', string='Max Users', readonly=True)
     
     # Computed price based on billing cycle
     current_price = fields.Monetary(
@@ -63,12 +66,15 @@ class SaasInstance(models.Model):
     # Thông tin subscription
     billing_cycle = fields.Selection([
         ('monthly', 'Monthly'),
+        ('quarterly', 'Quarterly'),
         ('yearly', 'Yearly')
     ], string='Billing Cycle', default='monthly')
     
     # Sử dụng tài nguyên
     current_users = fields.Integer(string='Current Users', default=1)
-    storage_used_gb = fields.Float(string='Storage Used (GB)', default=0.0)    # Computed fields
+    storage_used_gb = fields.Float(string='Storage Used (GB)', default=0.0)    
+    
+    # Computed fields
     days_until_expiry = fields.Integer(string='Days Until Expiry', compute='_compute_days_until_expiry', store=True)
     storage_percentage = fields.Float(string='Storage Usage %', compute='_compute_storage_percentage')
     
@@ -99,11 +105,11 @@ class SaasInstance(models.Model):
             else:
                 instance.days_until_expiry = 0
     
-    @api.depends('storage_used_gb', 'service_package_id.storage_gb')
+    @api.depends('storage_used_gb', 'plan_id.storage_limit_gb')
     def _compute_storage_percentage(self):
         for instance in self:
-            if instance.service_package_id.storage_gb > 0:
-                instance.storage_percentage = (instance.storage_used_gb / instance.service_package_id.storage_gb) * 100
+            if instance.plan_id and instance.plan_id.storage_limit_gb > 0:
+                instance.storage_percentage = (instance.storage_used_gb / instance.plan_id.storage_limit_gb) * 100
             else:
                 instance.storage_percentage = 0.0
     

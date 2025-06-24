@@ -43,26 +43,35 @@
                             <field name="plan_type"/>
                             <field name="current_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
                             <field name="plan_monthly_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
+                            <field name="plan_quarterly_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
                             <field name="plan_yearly_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
                             <field name="plan_currency_id" invisible="1"/>
                         </group>
-                    </group>
-                    <group>
-                        <group string="Technical Details">
-                            <field name="odoo_version"/>
-                            <field name="server_location"/>
+                        <group string="Subscription">
                             <field name="date_created"/>
-                            <field name="date_activated"/>
-                        </group>
-                        <group string="Subscription &amp; Usage">
                             <field name="trial_end_date"/>
+                            <field name="date_activated"/>
                             <field name="subscription_end_date"/>
                             <field name="days_until_expiry"/>
-                            <field name="current_users"/>
-                            <field name="storage_used_gb"/>
-                            <field name="storage_percentage" widget="progressbar"/>
                         </group>
                     </group>
+                    <notebook>
+                        <page string="Usage Statistics">
+                            <group>
+                                <field name="current_users"/>
+                                <field name="plan_max_users"/>
+                                <field name="storage_used_gb"/>
+                                <field name="plan_storage_limit_gb"/>
+                                <field name="storage_percentage" widget="progressbar"/>
+                            </group>
+                        </page>
+                        <page string="Technical Details">
+                            <group>
+                                <field name="odoo_version"/>
+                                <field name="server_location"/> 
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
