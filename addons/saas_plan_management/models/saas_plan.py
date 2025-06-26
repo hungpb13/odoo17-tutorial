@@ -241,11 +241,11 @@ class SaasPlan(models.Model):
         store=True    )
     
     # Computed fields for statistics
-    instance_count = fields.Integer(
-        string='Instance Count',
-        compute='_compute_instance_count',
-        help='Số lượng instances sử dụng plan này'
-    )
+    # instance_count = fields.Integer(
+    #     string='Instance Count',
+    #     compute='_compute_instance_count',
+    #     help='Số lượng instances sử dụng plan này'
+    # )
     
     effective_monthly_price = fields.Monetary(
         string='Effective Monthly Price',
@@ -281,14 +281,14 @@ class SaasPlan(models.Model):
         for plan in self:
             plan.addon_count = len(plan.addon_ids)
     
-    def _compute_instance_count(self):
-        """Compute number of instances using this plan"""
-        for plan in self:
-            # Use lazy loading to avoid dependency issues
-            if 'saas.instance' in self.env:
-                plan.instance_count = self.env['saas.instance'].search_count([('plan_id', '=', plan.id)])
-            else:
-                plan.instance_count = 0
+    # def _compute_instance_count(self):
+    #     """Compute number of instances using this plan"""
+    #     for plan in self:
+    #         # Use lazy loading to avoid dependency issues
+    #         if 'saas.instance' in self.env:
+    #             plan.instance_count = self.env['saas.instance'].search_count([('plan_id', '=', plan.id)])
+    #         else:
+    #             plan.instance_count = 0
     
     @api.depends('monthly_price', 'yearly_price', 'quarterly_price')
     def _compute_effective_prices(self):
@@ -323,21 +323,21 @@ class SaasPlan(models.Model):
             result.append((plan.id, name))
         return result
     
-    def action_view_instances(self):
-        """Action to view instances using this plan"""
-        # Check if saas.instance model exists
-        if 'saas.instance' not in self.env:
-            raise UserError(_('SaaS Instance model is not available. Please install SaaS Customer Management module.'))
+    # def action_view_instances(self):
+    #     """Action to view instances using this plan"""
+    #     # Check if saas.instance model exists
+    #     if 'saas.instance' not in self.env:
+    #         raise UserError(_('SaaS Instance model is not available. Please install SaaS Customer Management module.'))
         
-        return {
-            'type': 'ir.actions.act_window',
-            'name': f'Instances using {self.name}',
-            'res_model': 'saas.instance',
-            'view_mode': 'tree,form',
-            'domain': [('plan_id', '=', self.id)],
-            'context': {'default_plan_id': self.id},
-            'target': 'current',
-        }
+    #     return {
+    #         'type': 'ir.actions.act_window',
+    #         'name': f'Instances using {self.name}',
+    #         'res_model': 'saas.instance',
+    #         'view_mode': 'tree,form',
+    #         'domain': [('plan_id', '=', self.id)],
+    #         'context': {'default_plan_id': self.id},
+    #         'target': 'current',
+    #     }
     
     def action_view_modules(self):
         """Action to view included modules"""

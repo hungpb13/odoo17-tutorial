@@ -35,10 +35,10 @@
                         <group string="Customer &amp; Package">                            
                             <field name="customer_id"/>
                             <field name="service_package_id"/>
-                            <field name="plan_id"/>
+                            <!-- <field name="plan_id"/> -->
                             <field name="billing_cycle"/>
                         </group>
-                        <group string="Plan Information" invisible="not plan_id">
+                        <!-- <group string="Plan Information" invisible="not plan_id">
                             <field name="plan_name"/>
                             <field name="plan_type"/>
                             <field name="current_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
@@ -46,7 +46,7 @@
                             <field name="plan_quarterly_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
                             <field name="plan_yearly_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
                             <field name="plan_currency_id" invisible="1"/>
-                        </group>
+                        </group> -->
                         <group string="Subscription">
                             <field name="date_created"/>
                             <field name="trial_end_date"/>
@@ -59,9 +59,9 @@
                         <page string="Usage Statistics">
                             <group>
                                 <field name="current_users"/>
-                                <field name="plan_max_users"/>
+                                <!-- <field name="plan_max_users"/> -->
                                 <field name="storage_used_gb"/>
-                                <field name="plan_storage_limit_gb"/>
+                                <!-- <field name="plan_storage_limit_gb"/> -->
                                 <field name="storage_percentage" widget="progressbar"/>
                             </group>
                         </page>
@@ -87,10 +87,10 @@
                   decoration-muted="status == 'terminated'">                
                 <field name="instance_name"/>
                 <field name="customer_id"/>
-                <field name="plan_id"/>
+                <!-- <field name="plan_id"/>
                 <field name="plan_type"/>
                 <field name="current_price" widget="monetary" options="{'currency_field': 'plan_currency_id'}"/>
-                <field name="plan_currency_id" invisible="1"/>
+                <field name="plan_currency_id" invisible="1"/> -->
                 <field name="status"/>
                 <field name="odoo_version"/>
                 <field name="service_package_id"/>
@@ -110,7 +110,7 @@
         <field name="arch" type="xml">            <search>
                 <field name="instance_name"/>
                 <field name="customer_id"/>
-                <field name="plan_id"/>
+                <!-- <field name="plan_id"/> -->
                 <field name="subdomain"/>
                 <field name="database_id"/>
                 <filter string="Active" name="active" domain="[('status', '=', 'active')]"/>
@@ -122,7 +122,7 @@
                 <group string="Group By">
                     <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
                     <filter string="Customer" name="group_customer" context="{'group_by': 'customer_id'}"/>
-                    <filter string="Plan" name="group_plan" context="{'group_by': 'plan_id'}"/>
+                    <!-- <filter string="Plan" name="group_plan" context="{'group_by': 'plan_id'}"/> -->
                     <filter string="Service Package" name="group_package" context="{'group_by': 'service_package_id'}"/>
                     <filter string="Odoo Version" name="group_version" context="{'group_by': 'odoo_version'}"/>
                 </group>

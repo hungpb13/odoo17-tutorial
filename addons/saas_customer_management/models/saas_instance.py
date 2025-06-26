@@ -29,25 +29,25 @@ class SaasInstance(models.Model):
     # Quan hệ
     customer_id = fields.Many2one('saas.customer', string='Customer', required=True, ondelete='cascade')
     service_package_id = fields.Many2one('saas.service.package', string='Service Package', required=True)
-    plan_id = fields.Many2one('saas.plan', string='Plan')
+    # plan_id = fields.Many2one('saas.plan', string='Plan')
     
     # Plan related fields
-    plan_name = fields.Char(string='Plan Name', related='plan_id.name', readonly=True)
-    plan_type = fields.Selection(related='plan_id.plan_type', string='Plan Type', readonly=True)
-    plan_currency_id = fields.Many2one(related='plan_id.currency_id', readonly=True)
-    plan_monthly_price = fields.Monetary(related='plan_id.monthly_price', string='Monthly Price', currency_field='plan_currency_id', readonly=True)
-    plan_quarterly_price = fields.Monetary(related='plan_id.quarterly_price', string='Quarterly Price', currency_field='plan_currency_id', readonly=True)
-    plan_yearly_price = fields.Monetary(related='plan_id.yearly_price', string='Yearly Price', currency_field='plan_currency_id', readonly=True)
-    plan_storage_limit_gb = fields.Float(related='plan_id.storage_limit_gb', string='Storage Limit (GB)', readonly=True)
-    plan_max_users = fields.Integer(related='plan_id.max_users', string='Max Users', readonly=True)
+    # plan_name = fields.Char(string='Plan Name', related='plan_id.name', readonly=True)
+    # plan_type = fields.Selection(related='plan_id.plan_type', string='Plan Type', readonly=True)
+    # plan_currency_id = fields.Many2one(related='plan_id.currency_id', readonly=True)
+    # plan_monthly_price = fields.Monetary(related='plan_id.monthly_price', string='Monthly Price', currency_field='plan_currency_id', readonly=True)
+    # plan_quarterly_price = fields.Monetary(related='plan_id.quarterly_price', string='Quarterly Price', currency_field='plan_currency_id', readonly=True)
+    # plan_yearly_price = fields.Monetary(related='plan_id.yearly_price', string='Yearly Price', currency_field='plan_currency_id', readonly=True)
+    # plan_storage_limit_gb = fields.Float(related='plan_id.storage_limit_gb', string='Storage Limit (GB)', readonly=True)
+    # plan_max_users = fields.Integer(related='plan_id.max_users', string='Max Users', readonly=True)
     
     # Computed price based on billing cycle
-    current_price = fields.Monetary(
-        string='Current Price',
-        compute='_compute_current_price',
-        currency_field='plan_currency_id',
-        help='Price based on selected billing cycle'
-    )
+    # current_price = fields.Monetary(
+    #     string='Current Price',
+    #     compute='_compute_current_price',
+    #     currency_field='plan_currency_id',
+    #     help='Price based on selected billing cycle'
+    # )
     
     # Trạng thái và thời gian
     status = fields.Selection([
@@ -105,35 +105,43 @@ class SaasInstance(models.Model):
             else:
                 instance.days_until_expiry = 0
     
-    @api.depends('storage_used_gb', 'plan_id.storage_limit_gb')
+    @api.depends('storage_used_gb', 'service_package_id.storage_gb')
     def _compute_storage_percentage(self):
         for instance in self:
-            if instance.plan_id and instance.plan_id.storage_limit_gb > 0:
-                instance.storage_percentage = (instance.storage_used_gb / instance.plan_id.storage_limit_gb) * 100
+            if instance.service_package_id.storage_gb > 0:
+                instance.storage_percentage = (instance.storage_used_gb / instance.service_package_id.storage_gb) * 100
             else:
                 instance.storage_percentage = 0.0
+
+    # @api.depends('storage_used_gb', 'plan_id.storage_limit_gb')
+    # def _compute_storage_percentage(self):
+    #     for instance in self:
+    #         if instance.plan_id and instance.plan_id.storage_limit_gb > 0:
+    #             instance.storage_percentage = (instance.storage_used_gb / instance.plan_id.storage_limit_gb) * 100
+    #         else:
+    #             instance.storage_percentage = 0.0
     
-    @api.depends('plan_id', 'billing_cycle')
-    def _compute_current_price(self):
-        """Compute current price based on billing cycle"""
-        for instance in self:
-            if instance.plan_id:
-                if instance.billing_cycle == 'monthly':
-                    instance.current_price = instance.plan_id.monthly_price
-                elif instance.billing_cycle == 'quarterly':
-                    instance.current_price = instance.plan_id.quarterly_price
-                elif instance.billing_cycle == 'yearly':
-                    instance.current_price = instance.plan_id.yearly_price
-                else:
-                    instance.current_price = 0.0
-            else:
-                instance.current_price = 0.0
+    # @api.depends('plan_id', 'billing_cycle')
+    # def _compute_current_price(self):
+    #     """Compute current price based on billing cycle"""
+    #     for instance in self:
+    #         if instance.plan_id:
+    #             if instance.billing_cycle == 'monthly':
+    #                 instance.current_price = instance.plan_id.monthly_price
+    #             elif instance.billing_cycle == 'quarterly':
+    #                 instance.current_price = instance.plan_id.quarterly_price
+    #             elif instance.billing_cycle == 'yearly':
+    #                 instance.current_price = instance.plan_id.yearly_price
+    #             else:
+    #                 instance.current_price = 0.0
+    #         else:
+    #             instance.current_price = 0.0
     
-    @api.onchange('plan_id')
-    def _onchange_plan_id(self):
-        """Auto update billing cycle based on plan's default billing cycle"""
-        if self.plan_id and self.plan_id.billing_cycle:
-            self.billing_cycle = self.plan_id.billing_cycle
+    # @api.onchange('plan_id')
+    # def _onchange_plan_id(self):
+    #     """Auto update billing cycle based on plan's default billing cycle"""
+    #     if self.plan_id and self.plan_id.billing_cycle:
+    #         self.billing_cycle = self.plan_id.billing_cycle
     
     def action_activate(self):
         self.write({

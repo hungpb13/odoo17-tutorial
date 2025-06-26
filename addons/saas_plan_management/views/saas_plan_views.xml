@@ -17,7 +17,7 @@
                     <field name="max_users"/>
                     <field name="storage_limit_gb"/>
                     <field name="module_count"/>
-                    <field name="instance_count"/>
+                    <!-- <field name="instance_count"/> -->
                     <field name="active"/>
                 </tree>
             </field>
@@ -34,11 +34,11 @@
                         <field name="active" widget="boolean_toggle"/>
                     </header>
                     <sheet>
-                        <div class="oe_button_box" name="button_box">
+                        <!-- <div class="oe_button_box" name="button_box">
                             <button name="action_view_instances" type="object" class="oe_stat_button" icon="fa-desktop">
                                 <field name="instance_count" widget="statinfo" string="Instances"/>
                             </button>
-                        </div>
+                        </div> -->
                         <div class="oe_title">
                             <label for="name" class="oe_edit_only"/>
                             <h1><field name="name" placeholder="Plan Name"/></h1>
@@ -55,7 +55,7 @@
                                 <field name="currency_id"/>
                                 <field name="module_count"/>
                                 <field name="addon_count"/>
-                                <field name="instance_count"/>
+                                <!-- <field name="instance_count"/> -->
                             </group>
                         </group>
                         
@@ -168,7 +168,7 @@
                     <field name="yearly_price"/>
                     <field name="max_users"/>
                     <field name="module_count"/>
-                    <field name="instance_count"/>
+                    <!-- <field name="instance_count"/> -->
                     <field name="active"/>
                     <templates>
                         <t t-name="kanban-box">
@@ -192,7 +192,7 @@
                                             </li>
                                             <li><strong>Max Users:</strong> <field name="max_users"/></li>
                                             <li><strong>Modules:</strong> <field name="module_count"/></li>
-                                            <li><strong>Instances:</strong> <field name="instance_count"/></li>
+                                            <!-- <li><strong>Instances:</strong> <field name="instance_count"/></li> -->
                                         </ul>
                                     </div>
                                 </div>

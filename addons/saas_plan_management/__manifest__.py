@@ -37,6 +37,7 @@ Module quản lý các gói dịch vụ SaaS bao gồm:
         'web',
         'mail',
         'portal',
+        'saas_customer_management',
     ],
     'data': [
         # Security
