@@ -45,7 +45,7 @@
         
         <record id="module_sale" model="saas.odoo.module">
             <field name="name">Sales Management</field>
-            <field name="technical_name">sale</field>
+            <field name="technical_name">sale_management</field>
             <field name="category">sales</field>
             <field name="description">Sales orders and quotations</field>
             <field name="is_popular">True</field>
