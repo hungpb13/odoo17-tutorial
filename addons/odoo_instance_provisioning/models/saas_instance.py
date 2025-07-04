@@ -7,6 +7,9 @@ import xmlrpc.client
 from datetime import datetime, timedelta
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
+import psycopg2
+import time
+import requests
 
 # Optional imports
 try:
@@ -161,12 +164,12 @@ class SaasInstanceProvisioning(models.Model):
     def _get_available_port(self):
         """Get next available port for instance"""
         # Simple implementation - in production, use better port management
-        # last_instance = self.search([], order='port desc', limit=1)
-        # if last_instance and last_instance.port:
-        #     return last_instance.port + 1
-        # else:
-        #     return 8070  # Start from 8070
-        return 8069 
+        last_instance = self.search([], order='port desc', limit=1)
+        if last_instance and last_instance.port:
+            return last_instance.port + 1
+        else:
+            return 8070  # Start from 8070
+        # return 8069 
     
     def action_provision(self):
         """Start the provisioning process"""
@@ -251,8 +254,8 @@ class SaasInstanceProvisioning(models.Model):
             self._create_log('info', 'Starting database creation')
             self._create_database()
             
-            # self._create_log('info', 'Starting container deployment')
-            # self._deploy_container()
+            self._create_log('info', 'Starting container deployment')
+            self._deploy_container()
             
             self._create_log('info', 'Installing modules')
             self._install_modules()
@@ -379,40 +382,89 @@ class SaasInstanceProvisioning(models.Model):
             raise Exception(error_msg)
         
         self._create_log('info', f'Database {self.database_name} created successfully')
-    
+
     def _deploy_container(self):
         """Deploy Docker container for the instance"""
         if not HAS_DOCKER:
             raise Exception("Docker library not available. Please install: pip install docker")
-        
+
         try:
+            # 🔎 Bước 1: Kiểm tra kết nối PostgreSQL trước
+            conn = psycopg2.connect(
+                dbname=self.database_name,
+                user='odoo',                  # hoặc self.db_user nếu có
+                password='odoo',              # hoặc self.db_password
+                host='db',             # đổi từ localhost thành tên service container postgres
+                port=5432
+            )
+            conn.close()
+            self._create_log('info', f"✅ Database {self.database_name} is accessible")
+
+            # 🐳 Bước 2: Khởi tạo Docker container
             client = docker.from_env()
+
+            volume_name = f'odoo_data_{self.database_name}'
+            try:
+                # Tạo volume Docker (nếu chưa có)
+                client.volumes.get(volume_name)
+            except docker.errors.NotFound:
+                client.volumes.create(name=volume_name)
             
-            # Container configuration
             container_config = {
                 'image': f'odoo:{self.odoo_version}',
                 'name': f'odoo_{self.database_name}',
-                'ports': {8069: self.port},
+                'ports': {'8069/tcp': self.port},
                 'environment': {
-                    'HOST': 'db',
+                    'HOST': 'db',               # Đây là tên host DB trong mạng Docker
                     'USER': 'odoo',
                     'PASSWORD': 'odoo',
+                    'DATABASE': self.database_name,  # thêm biến để Odoo biết tên DB
                 },
                 'volumes': {
-                    f'/opt/odoo/data_{self.database_name}': {
+                    volume_name: {
                         'bind': '/var/lib/odoo',
                         'mode': 'rw'
                     }
-                }
+                },
+                'network': 'odoo17-tutorial_default',
+                'detach': True,
+                'restart_policy': {"Name": "unless-stopped"},
+                'command': f"--db-filter=^{self.database_name}$",
             }
-            
-            container = client.containers.run(**container_config, detach=True)
+
+            container = client.containers.run(**container_config)
             self.container_id = container.id
-            
-            self._create_log('info', f'Container {container.id} deployed successfully')
-            
+            self._create_log('info', f'✅ Container {container.id} deployed successfully')
+
+        except psycopg2.OperationalError as db_err:
+            self._create_log('error', f'❌ Cannot connect to database {self.database_name}: {str(db_err)}')
+            raise Exception(f"Database connection failed: {str(db_err)}")
+
+        except docker.errors.APIError as docker_err:
+            self._create_log('error', f'❌ Docker error: {str(docker_err)}')
+            raise Exception(f"Container deployment failed: {str(docker_err)}")
+
         except Exception as e:
+            self._create_log('error', f'❌ Unexpected error: {str(e)}')
             raise Exception(f"Container deployment failed: {str(e)}")
+
+    def _wait_for_odoo(self, timeout=90):
+        """Wait until Odoo is up and responding on HTTP"""
+        container_host = f"odoo_{self.database_name}"  # tên container bạn đặt khi tạo
+        url = f"http://{container_host}:8069"
+        deadline = time.time() + timeout
+
+        while time.time() < deadline:
+            try:
+                res = requests.get(url, timeout=5)
+                if res.status_code == 200:
+                    self._create_log('info', f"Odoo instance is up at {url}")
+                    return
+            except requests.exceptions.ConnectionError:
+                pass
+            time.sleep(3)
+
+        raise Exception(f"Timed out waiting for Odoo at {url}")
     
     def _install_modules(self):
         """Install modules based on service plan"""
@@ -420,11 +472,14 @@ class SaasInstanceProvisioning(models.Model):
             return
 
         try:
+            # Wait for Odoo to start
+            self._wait_for_odoo(timeout=240)
+
             # RPC connection
-            url = f'http://localhost:{self.port}'
+            # url = f'http://localhost:{self.port}'
+            container_host = f"odoo_{self.database_name}"  # tên container bạn đặt khi tạo
+            url = f"http://{container_host}:8069"
             db = self.database_name
-            # username = self.admin_email
-            # password = self.admin_password
             username = 'admin'
             password = 'admin'
 
@@ -474,7 +529,8 @@ class SaasInstanceProvisioning(models.Model):
     def _setup_admin_user(self):
         """Setup admin user for the instance"""
         try:
-            url = f'http://localhost:{self.port}'
+            container_host = f"odoo_{self.database_name}"  # tên container bạn đặt khi tạo
+            url = f"http://{container_host}:8069"
             db = self.database_name
             username = 'admin'
             password = 'admin'
@@ -503,7 +559,8 @@ class SaasInstanceProvisioning(models.Model):
     def _setup_company(self):
         """Setup company information"""
         try:
-            url = f'http://localhost:{self.port}'
+            container_host = f"odoo_{self.database_name}"  # tên container bạn đặt khi tạo
+            url = f"http://{container_host}:8069"
             db = self.database_name
             username = self.admin_email
             password = self.admin_password

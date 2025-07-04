@@ -1,5 +1,6 @@
 services:
   odoo:
+    user: root
     image: odoo:17.0
     depends_on:
       - db
@@ -9,6 +10,7 @@ services:
       - odoo-data:/var/lib/odoo
       - ./addons:/mnt/extra-addons
       - ./config:/etc/odoo
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - HOST=db
       - USER=odoo
