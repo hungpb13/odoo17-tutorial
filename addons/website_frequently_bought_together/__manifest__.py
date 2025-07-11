@@ -13,7 +13,7 @@
         'data/fbt_cron.xml',
     ],
     'assets': {
-        'web.assets_frontend': [
+        'web.assets_frontend': [ 
             'website_frequently_bought_together/static/src/css/fbt_styles.css',
             'website_frequently_bought_together/static/src/js/fbt_carousel.js',
         ],
