@@ -38,6 +38,7 @@
         # 'views/product_template_views.xml',
         "views/website_templates.xml",
         "views/menu_views.xml",
+        "data/combo_demo_data.xml",
     ],
     "assets": {
         "web.assets_frontend": [

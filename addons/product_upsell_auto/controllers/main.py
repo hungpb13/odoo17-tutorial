@@ -114,3 +114,184 @@ class WebsiteSaleUpsell(WebsiteSale):
             _logger = logging.getLogger(__name__)
             _logger.error(f"Error generating upsell recommendations: {e}")
             return request.redirect("/shop")
+
+    @http.route(
+        ["/shop/combo/add_to_cart"],
+        type="json",
+        auth="public",
+        website=True,
+    )
+    def add_combo_to_cart(self, combo_id, **kwargs):
+        """Add combo products to cart"""
+        try:
+            combo = request.env["product.combo"].sudo().browse(combo_id)
+            if not combo.exists() or not combo.active or not combo.website_published:
+                return {"success": False, "message": "Combo not found or not available"}
+
+            sale_order = request.website.sale_get_order(force_create=True)
+
+            # Add each product in combo to cart
+            for line in combo.combo_line_ids:
+                if line.product_id and line.quantity > 0:
+                    sale_order._cart_update(
+                        product_id=line.product_id.product_variant_ids[0].id,
+                        add_qty=line.quantity,
+                        combo_id=combo.id,  # Track combo reference
+                    )
+
+            return {
+                "success": True,
+                "message": f"Combo '{combo.name}' added to cart",
+                "cart_quantity": sale_order.cart_quantity,
+            }
+
+        except Exception as e:
+            import logging
+
+            _logger = logging.getLogger(__name__)
+            _logger.error(f"Error adding combo to cart: {e}")
+            return {"success": False, "message": str(e)}
+
+    @http.route(
+        "/shop/combo/add",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        website=True,
+        csrf=False,
+    )
+    def add_combo_to_cart(self, combo_id=None, **kwargs):
+        """Add a complete combo to cart"""
+        try:
+            if not combo_id:
+                return request.redirect("/shop")
+
+            combo_id = int(combo_id)
+            combo = request.env["product.combo"].sudo().browse(combo_id)
+
+            if not combo.exists() or not combo.active:
+                return request.redirect("/shop")
+
+            # Get or create sale order
+            order = request.website.sale_get_order(force_create=True)
+
+            # Ensure order exists and is in draft state
+            if not order or order.state != "draft":
+                return request.redirect("/shop")
+
+            # Add combo to cart using the method from website_product_promotions
+            if hasattr(order, "add_combo_to_cart") and order.add_combo_to_cart(
+                combo_id
+            ):
+                return request.redirect("/shop/cart")
+            else:
+                # Fallback: Add products individually
+                for combo_line in combo.combo_line_ids:
+                    if combo_line.product_id and combo_line.quantity > 0:
+                        order._cart_update(
+                            product_id=combo_line.product_id.id,
+                            add_qty=combo_line.quantity,
+                        )
+                return request.redirect("/shop/cart")
+
+        except (ValueError, TypeError) as e:
+            # Log error for debugging
+            import logging
+
+            _logger = logging.getLogger(__name__)
+            _logger.error(f"Error adding combo to cart: {e}")
+            return request.redirect("/shop")
+        except Exception as e:
+            # Log unexpected errors
+            import logging
+
+            _logger = logging.getLogger(__name__)
+            _logger.error(f"Unexpected error in add_combo_to_cart: {e}")
+            return request.redirect("/shop")
+
+    @http.route("/test/combo", type="http", auth="public", website=True)
+    def test_combo(self, **kwargs):
+        """Test route to debug combo functionality"""
+        # Get any product for testing
+        product = request.env["product.template"].search(
+            [("website_published", "=", True)], limit=1
+        )
+
+        if not product:
+            return "No products found"
+
+        # Ensure we have at least one combo for testing
+        combo_count = request.env["product.combo"].sudo().search_count([])
+        if combo_count == 0:
+            # Create a test combo if none exists
+            try:
+                products = (
+                    request.env["product.product"]
+                    .sudo()
+                    .search([("sale_ok", "=", True)], limit=2)
+                )
+                if len(products) >= 2:
+                    test_combo = (
+                        request.env["product.combo"]
+                        .sudo()
+                        .create(
+                            {
+                                "name": "Test Combo for Debug",
+                                "description": "Auto-generated combo for testing",
+                                "discount_percentage": 15.0,
+                                "active": True,
+                                "website_published": True,
+                            }
+                        )
+                    )
+
+                    # Add products to combo
+                    for i, prod in enumerate(products):
+                        request.env["product.combo.line"].sudo().create(
+                            {
+                                "combo_id": test_combo.id,
+                                "product_id": prod.id,
+                                "quantity": 1,
+                                "sequence": (i + 1) * 10,
+                            }
+                        )
+            except Exception as e:
+                import logging
+
+                _logger = logging.getLogger(__name__)
+                _logger.error(f"Error creating test combo: {e}")
+
+        # Test get_related_combos method
+        related_combos = product.get_related_combos()
+
+        # Also get all combos for comparison
+        all_combos = (
+            request.env["product.combo"]
+            .sudo()
+            .search([("active", "=", True), ("website_published", "=", True)])
+        )
+
+        values = {
+            "product": product,
+            "related_combos": related_combos,
+            "all_combos": all_combos,
+        }
+
+        return request.render("product_upsell_auto.test_combo_page", values)
+
+    @http.route("/test/add-combo", type="http", auth="public", website=True)
+    def test_add_combo(self, **kwargs):
+        """Test add combo route"""
+        return """
+        <html>
+        <body>
+            <h1>Test Add Combo</h1>
+            <form action="/shop/combo/add" method="post">
+                <input type="hidden" name="combo_id" value="1"/>
+                <button type="submit">Test Add Combo 1</button>
+            </form>
+            <br/>
+            <a href="/test/combo">Back to Test Page</a>
+        </body>
+        </html>
+        """

@@ -287,3 +287,27 @@ class ProductTemplate(models.Model):
                     f"Setting sale_ok=True for {rec.recommended_product_id.name}"
                 )
                 rec.recommended_product_id.sudo().write({"sale_ok": True})
+
+    def get_related_combos(self, limit=4):
+        """Get combos that contain this product"""
+        self.ensure_one()
+
+        _logger.info(f"Getting related combos for product: {self.name} (ID: {self.id})")
+
+        # Find combo lines that contain this product (search by product_tmpl_id)
+        combo_lines = self.env["product.combo.line"].search(
+            [("product_id.product_tmpl_id", "=", self.id)]
+        )
+
+        _logger.info(f"Found {len(combo_lines)} combo lines for product {self.id}")
+
+        # Get the combos
+        combos = combo_lines.mapped("combo_id").filtered(
+            lambda c: c.active and c.website_published
+        )
+
+        _logger.info(
+            f"Found {len(combos)} active combos for product {self.name}: {[c.name for c in combos]}"
+        )
+
+        return combos[:limit]

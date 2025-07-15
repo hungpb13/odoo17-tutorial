@@ -1,5 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Section hiển thị danh sách Related Combos -->
+    <template id="product_combo_section" name="Related Combos Section">
+        <!-- Lấy related_combos trực tiếp từ product -->
+        <t t-set="related_combos" t-value="product.get_related_combos()"/>
+        <t t-if="related_combos">
+            <section class="container py-4">
+                <h3 class="mb-4 text-center">
+                    <i class="fa fa-gift text-success me-2"></i>
+                    Complete your setup with these bundles
+                </h3>
+                <div class="row">
+                    <t t-foreach="related_combos" t-as="combo">
+                        <div class="col-lg-6 col-md-12 mb-4">
+                            <div class="card h-100 shadow-sm combo-card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-2">
+                                        <t t-esc="combo.name"/>
+                                    </h5>
+                                    
+                                    <div class="text-center mb-3">
+                                        <div class="original-price text-muted text-decoration-line-through small">
+                                            <t t-esc="combo.original_price"/> ₫
+                                        </div>
+                                        <div class="combo-price fw-bold text-success h5 mb-0">
+                                            <t t-esc="combo.price_total"/> ₫
+                                        </div>
+                                        <div class="badge bg-danger" t-if="combo.discount_percentage > 0">
+                                            Save <t t-esc="round(combo.discount_percentage)"/>%
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Products in combo -->
+                                    <div class="combo-products mb-3" t-if="combo.combo_line_ids">
+                                        <h6 class="text-muted mb-2">Includes:</h6>
+                                        <ul class="list-unstyled small">
+                                            <t t-foreach="combo.combo_line_ids" t-as="line">
+                                                <li>
+                                                    <i class="fa fa-check text-success me-1"></i>
+                                                    <t t-esc="line.quantity"/> x <t t-esc="line.product_id.name"/>
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </div>
+                                    
+                                    <!-- Add to cart form (giống như trong combo_list template) -->
+                                    <div class="text-center">
+                                        <form action="/shop/combo/add" method="post" class="d-inline">
+                                            <input type="hidden" name="combo_id" t-att-value="combo.id"/>
+                                            <button type="submit" class="btn btn-success w-100">
+                                                <i class="fa fa-shopping-cart me-2"></i>
+                                                Add Bundle to Cart
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </section>
+        </t>
+        <!-- Debug: Show message if no combos found -->
+        <t t-if="not related_combos">
+            <div class="container py-2">
+                <div class="alert alert-info">
+                    <strong>Debug:</strong> No related combos found for product: <t t-esc="product.name"/>
+                </div>
+            </div>
+        </t>
+    </template>
+
     <!-- Section hiển thị danh sách Upsell Recommendations, lấy trực tiếp từ product trong QWeb (chuẩn Odoo 17) -->
     <template id="product_upsell_section" name="Upsell Recommendations Section">
         <!-- Lấy upsell_products trực tiếp từ product -->
@@ -32,11 +103,99 @@
         </t>
     </template>
 
-    <!-- Kế thừa view gốc, chèn section upsell sau Alternative Products -->
+    <!-- Kế thừa view gốc, chèn section combo và upsell sau Alternative Products -->
     <template id="product_upsell_main" inherit_id="website_sale.product">
         <xpath expr="//div[@id='oe_structure_website_sale_recommended_products']" position="after">
-            <!-- Gọi section upsell vừa tạo, không cần truyền context nữa -->
+            <!-- Gọi section combo trước -->
+            <t t-call="product_upsell_auto.product_combo_section"/>
+            <!-- Sau đó gọi section upsell -->
             <t t-call="product_upsell_auto.product_upsell_section"/>
         </xpath>
+    </template>
+
+    <!-- Test template for combo debugging -->
+    <template id="test_combo_page" name="Test Combo Page">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container py-5">
+                    <h1>Combo Test Page</h1>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <h3>Testing Product: <t t-esc="product.name"/></h3>
+                            <p>Product ID: <t t-esc="product.id"/></p>
+                            
+                            <h4>Related Combos Found: <t t-esc="len(related_combos)"/></h4>
+                            <h4>All Combos Available: <t t-esc="len(all_combos)"/></h4>
+                            
+                            <t t-if="all_combos">
+                                <h5>All Available Combos:</h5>
+                                <div class="row">
+                                    <t t-foreach="all_combos" t-as="combo">
+                                        <div class="col-lg-6 mb-3">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h5><t t-esc="combo.name"/></h5>
+                                                    <p>ID: <t t-esc="combo.id"/></p>
+                                                    <p>Active: <t t-esc="combo.active"/></p>
+                                                    <p>Published: <t t-esc="combo.website_published"/></p>
+                                                    <p>Price: <t t-esc="combo.price_total"/> ₫</p>
+                                                    <p>Products in combo:</p>
+                                                    <ul>
+                                                        <t t-foreach="combo.combo_line_ids" t-as="line">
+                                                            <li><t t-esc="line.product_id.name"/> (Template ID: <t t-esc="line.product_id.product_tmpl_id.id"/>)</li>
+                                                        </t>
+                                                    </ul>
+                                                    <form action="/shop/combo/add" method="post" class="d-inline">
+                                                        <input type="hidden" name="combo_id" t-att-value="combo.id"/>
+                                                        <button type="submit" class="btn btn-success">
+                                                            <i class="fa fa-shopping-cart me-2"></i>
+                                                            Test Add to Cart
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                            
+                            <hr/>
+                            
+                            <t t-if="related_combos">
+                                <h5>Related Combos for this Product:</h5>
+                                <div class="row">
+                                    <t t-foreach="related_combos" t-as="combo">
+                                        <div class="col-lg-6 mb-3">
+                                            <div class="card border-success">
+                                                <div class="card-body">
+                                                    <h5><t t-esc="combo.name"/></h5>
+                                                    <p>ID: <t t-esc="combo.id"/></p>
+                                                    <p>Active: <t t-esc="combo.active"/></p>
+                                                    <p>Published: <t t-esc="combo.website_published"/></p>
+                                                    <p>Price: <t t-esc="combo.price_total"/> ₫</p>
+                                                    <form action="/shop/combo/add" method="post" class="d-inline">
+                                                        <input type="hidden" name="combo_id" t-att-value="combo.id"/>
+                                                        <button type="submit" class="btn btn-success">
+                                                            <i class="fa fa-shopping-cart me-2"></i>
+                                                            Test Add to Cart
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-warning">
+                                    No combos found for this product.
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
     </template>
 </odoo>

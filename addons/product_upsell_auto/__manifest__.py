@@ -5,19 +5,22 @@
     "category": "Website/eCommerce",
     "summary": "Automatic product upsell recommendations based on data analysis",
     "description": """
-        This module provides automatic product upsell recommendations for Odoo eCommerce:
+        This module provides automatic product upsell recommendations and combo bundles for Odoo eCommerce:
         
         Features:
         - Automatic upsell product recommendations based on category and price
+        - Product combo/bundle functionality with discounted pricing
         - Smart algorithm to suggest higher-priced products in same category
+        - Related combo suggestions on product detail pages
         - Automated cron job to update recommendations daily
-        - Beautiful frontend display of upsell suggestions
-        - Backend management of recommendations
+        - Beautiful frontend display of upsell suggestions and combo bundles
+        - Backend management of recommendations and combos
         
         Key Benefits:
-        - Increase average order value automatically
+        - Increase average order value automatically with upsells and combos
         - Reduce manual work of setting up upsell products
         - Data-driven recommendations
+        - Bundle products together for better sales
         - Improved customer experience with relevant suggestions
         - Easy integration with existing eCommerce setup
     """,
@@ -27,6 +30,7 @@
         "product",
         "website_sale",
         "sale_management",
+        "website_product_promotions",
     ],
     "data": [
         "security/ir.model.access.csv",
@@ -38,6 +42,7 @@
     "assets": {
         "web.assets_frontend": [
             "product_upsell_auto/static/src/css/upsell.css",
+            "product_upsell_auto/static/src/css/combo_style.css",
         ],
     },
     "installable": True,
