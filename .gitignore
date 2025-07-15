@@ -1,0 +1,56 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Odoo log files
+*.log
+
+# Local configuration
+config/odoo.conf
+*.db
+*.sql
+*.pot
+
+# Editor & OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Docker volumes
+odoo-web-data/
+odoo-db-data/
+
+# Docker / Compose artifacts
+.env
+.env.*
+*.pid
+*.seed
+*.bak
+
+# Python virtual env
+.venv/
+env/
+venv/
+ENV/
+
+# Pip cache
+.cache/
+pip-wheel-metadata/
+*.egg-info/
+
+# Test & coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.cache/
+nosetests.xml
+pytest_cache/
+
+# GitLab artifacts (optional)
+.gitlab-ci-local/
