@@ -43,6 +43,8 @@
         "web.assets_frontend": [
             "product_upsell_auto/static/src/css/upsell.css",
             "product_upsell_auto/static/src/css/combo_style.css",
+            "product_upsell_auto/static/src/css/upsell_styles.css",
+            "product_upsell_auto/static/src/js/upsell_carousel.js",
         ],
     },
     "installable": True,

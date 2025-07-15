@@ -76,25 +76,30 @@
         <!-- Lấy upsell_products trực tiếp từ product -->
         <t t-set="upsell_products" t-value="product.get_upsell_recommendations()"/>
         <t t-if="upsell_products">
-            <section class="container py-4">
-                <h3 class="mb-4">Upgrade for More Features</h3>
-                <div class="row">
+            <section class="oe_upsell_section mt32 container">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="fa fa-arrow-up me-2" style="font-size: 1.5em; color: #333;"></span>
+                    <h3 class="mb-0 flex-grow-1">Upgrade for More Features</h3>
+                    <button type="button" class="upsell-carousel-nav prev" aria-label="Previous"><span class="fa fa-angle-left"></span></button>
+                    <button type="button" class="upsell-carousel-nav next" aria-label="Next"><span class="fa fa-angle-right"></span></button>
+                </div>
+                <div class="upsell-carousel">
                     <t t-foreach="upsell_products" t-as="upsell">
-                        <div class="col-lg-3 col-md-4 col-6 mb-4">
-                            <div class="card h-100">
-                                <a t-att-href="'/shop/product/%s' % upsell.id">
-                                    <img t-att-src="'/web/image/product.template/%s/image_1920' % upsell.id" class="card-img-top" t-att-alt="upsell.name"/>
+                        <div class="upsell-card">
+                            <a t-att-href="'/shop/product/%s' % upsell.id">
+                                <t t-if="upsell.image_1920">
+                                    <img t-att-src="'/web/image/product.template/%s/image_1920' % upsell.id" class="upsell-card-img" t-att-alt="upsell.name"/>
+                                </t>
+                            </a>
+                            <div class="px-3 pb-3 d-flex flex-column align-items-stretch">
+                                <a t-att-href="'/shop/product/%s' % upsell.id" class="text-decoration-none text-dark">
+                                    <div class="upsell-card-title" t-esc="upsell.name"/>
                                 </a>
-                                <div class="card-body">
-                                    <h5 class="card-title">
-                                        <a t-att-href="'/shop/product/%s' % upsell.id" class="text-decoration-none"><t t-esc="upsell.name"/></a>
-                                    </h5>
-                                    <div class="fw-bold mb-2">
-                                        <t t-esc="upsell.currency_id.symbol"/>
-                                        <t t-esc="upsell.list_price"/>
-                                    </div>
-                                    <a t-att-href="'/shop/product/%s' % upsell.id" class="btn btn-outline-primary w-100 mt-2">View Details</a>
+                                <div class="upsell-card-price fw-bold mb-2">
+                                    <t t-esc="upsell.currency_id.symbol"/>
+                                    <t t-esc="upsell.list_price"/>
                                 </div>
+                                <a t-att-href="'/shop/product/%s' % upsell.id" class="btn btn-outline-primary w-100 mt-2">View Details</a>
                             </div>
                         </div>
                     </t>
