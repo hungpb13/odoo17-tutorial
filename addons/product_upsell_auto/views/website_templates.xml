@@ -6,28 +6,29 @@
         <t t-set="upsell_products" t-value="product.get_upsell_recommendations()"/>
         <t t-if="upsell_products">
             <section class="container py-4">
-                <h3 class="mb-4 text-center">Upsell Recommendations</h3>
+                <h3 class="mb-4">Upgrade for More Features</h3>
                 <div class="row">
                     <t t-foreach="upsell_products" t-as="upsell">
                         <div class="col-lg-3 col-md-4 col-6 mb-4">
                             <div class="card h-100">
-                                <img t-att-src="'/web/image/product.template/%s/image_1920' % upsell.id" class="card-img-top" t-att-alt="upsell.name"/>
-                                <div class="card-body text-center">
+                                <a t-att-href="'/shop/product/%s' % upsell.id">
+                                    <img t-att-src="'/web/image/product.template/%s/image_1920' % upsell.id" class="card-img-top" t-att-alt="upsell.name"/>
+                                </a>
+                                <div class="card-body">
                                     <h5 class="card-title">
-                                        <a t-att-href="'/shop/product/%s' % upsell.id"><t t-esc="upsell.name"/></a>
+                                        <a t-att-href="'/shop/product/%s' % upsell.id" class="text-decoration-none"><t t-esc="upsell.name"/></a>
                                     </h5>
-                                    <div class="fw-bold text-primary mb-2">
-                                        <t t-esc="upsell.list_price"/> ₫
+                                    <div class="fw-bold mb-2">
+                                        <t t-esc="upsell.currency_id.symbol"/>
+                                        <t t-esc="upsell.list_price"/>
                                     </div>
+                                    <a t-att-href="'/shop/product/%s' % upsell.id" class="btn btn-outline-primary w-100 mt-2">View Details</a>
                                 </div>
                             </div>
                         </div>
                     </t>
                 </div>
             </section>
-        </t>
-        <t t-else="">
-            <span>NO UPSELL DATA</span>
         </t>
     </template>
 
