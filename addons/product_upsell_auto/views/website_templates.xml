@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Section hiển thị danh sách Upsell Recommendations, lấy trực tiếp từ product trong QWeb (chuẩn Odoo 17) -->
+    <template id="product_upsell_section" name="Upsell Recommendations Section">
+        <!-- Lấy upsell_products trực tiếp từ product -->
+        <t t-set="upsell_products" t-value="product.get_upsell_recommendations()"/>
+        <t t-if="upsell_products">
+            <section class="container py-4">
+                <h3 class="mb-4 text-center">Upsell Recommendations</h3>
+                <div class="row">
+                    <t t-foreach="upsell_products" t-as="upsell">
+                        <div class="col-lg-3 col-md-4 col-6 mb-4">
+                            <div class="card h-100">
+                                <img t-att-src="'/web/image/product.template/%s/image_1920' % upsell.id" class="card-img-top" t-att-alt="upsell.name"/>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">
+                                        <a t-att-href="'/shop/product/%s' % upsell.id"><t t-esc="upsell.name"/></a>
+                                    </h5>
+                                    <div class="fw-bold text-primary mb-2">
+                                        <t t-esc="upsell.list_price"/> ₫
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </section>
+        </t>
+        <t t-else="">
+            <span>NO UPSELL DATA</span>
+        </t>
+    </template>
+
+    <!-- Kế thừa view gốc, chèn section upsell sau Alternative Products -->
+    <template id="product_upsell_main" inherit_id="website_sale.product">
+        <xpath expr="//div[@id='oe_structure_website_sale_recommended_products']" position="after">
+            <!-- Gọi section upsell vừa tạo, không cần truyền context nữa -->
+            <t t-call="product_upsell_auto.product_upsell_section"/>
+        </xpath>
+    </template>
+</odoo>

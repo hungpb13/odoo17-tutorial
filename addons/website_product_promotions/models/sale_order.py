@@ -16,31 +16,54 @@ class SaleOrder(models.Model):
         self, product_id=None, line_id=None, add_qty=0, set_qty=0, **kwargs
     ):
         """Override to check and apply combo discounts after cart update"""
-        result = super()._cart_update(product_id, line_id, add_qty, set_qty, **kwargs)
+        try:
+            result = super()._cart_update(
+                product_id, line_id, add_qty, set_qty, **kwargs
+            )
 
-        # Check for applicable combos after cart update
-        self._apply_combo_discounts()
+            # Check for applicable combos after cart update
+            self._apply_combo_discounts()
 
-        return result
+            return result
+        except Exception as e:
+            # Log the error and continue with normal cart update
+            import logging
+
+            _logger = logging.getLogger(__name__)
+            _logger.error(f"Error in combo cart update: {e}")
+            return super()._cart_update(product_id, line_id, add_qty, set_qty, **kwargs)
 
     def _apply_combo_discounts(self):
         """Check all active combos and apply discounts if cart matches"""
         self.ensure_one()
 
-        # Reset previous combo applications
-        self.order_line.write({"discount": 0, "combo_applied": False})
-        self.applied_combo_ids = [(5, 0, 0)]
+        # Skip if order is already confirmed or if no order lines
+        if self.state != "draft" or not self.order_line:
+            return
 
-        # Get all active combos
-        active_combos = self.env["product.combo"].search([("active", "=", True)])
+        try:
+            # Reset previous combo applications
+            existing_lines = self.order_line.filtered(lambda l: l.product_id)
+            existing_lines.write({"discount": 0, "combo_applied": False})
+            self.applied_combo_ids = [(5, 0, 0)]
 
-        applied_combos = []
-        for combo in active_combos:
-            if self._check_and_apply_combo(combo):
-                applied_combos.append(combo.id)
+            # Get all active combos
+            active_combos = self.env["product.combo"].search([("active", "=", True)])
 
-        if applied_combos:
-            self.applied_combo_ids = [(6, 0, applied_combos)]
+            applied_combos = []
+            for combo in active_combos:
+                if self._check_and_apply_combo(combo):
+                    applied_combos.append(combo.id)
+
+            if applied_combos:
+                self.applied_combo_ids = [(6, 0, applied_combos)]
+        except Exception as e:
+            # Log the error but don't fail the entire operation
+            import logging
+
+            _logger = logging.getLogger(__name__)
+            _logger.error(f"Error applying combo discounts: {e}")
+            pass
 
     def _check_and_apply_combo(self, combo):
         """Check if combo can be applied and apply it"""
@@ -105,13 +128,17 @@ class SaleOrder(models.Model):
                     new_line_vals = order_line.copy_data()[0]
                     new_line_vals.update(
                         {
+                            "order_id": self.id,  # Fix: Ensure order_id is set
                             "product_uom_qty": used_qty,
                             "discount": discount_rate,
                             "combo_applied": True,
                             "combo_id": combo.id,
                         }
                     )
-                    self.env["sale.order.line"].create(new_line_vals)
+                    # Create with context to ensure proper order assignment
+                    self.env["sale.order.line"].with_context(
+                        default_order_id=self.id, active_order=self
+                    ).create(new_line_vals)
 
             return True
 
@@ -125,9 +152,10 @@ class SaleOrder(models.Model):
 
         # Add each product from combo to cart
         for combo_line in combo.combo_line_ids:
-            self._cart_update(
-                product_id=combo_line.product_id.id, add_qty=combo_line.quantity
-            )
+            if combo_line.product_id and combo_line.quantity > 0:
+                self._cart_update(
+                    product_id=combo_line.product_id.id, add_qty=combo_line.quantity
+                )
 
         return True
 
@@ -146,3 +174,17 @@ class SaleOrderLine(models.Model):
         string="Applied Combo",
         help="The combo that was applied to this line",
     )
+
+    @api.model
+    def create(self, vals):
+        """Override create to ensure order_id is always set"""
+        if "order_id" not in vals and self.env.context.get("default_order_id"):
+            vals["order_id"] = self.env.context["default_order_id"]
+
+        if "order_id" not in vals:
+            # If no order_id, try to get from current context
+            active_order = self.env.context.get("active_order")
+            if active_order:
+                vals["order_id"] = active_order.id
+
+        return super().create(vals)

@@ -28,13 +28,29 @@ class ComboController(WebsiteSale):
             # Get or create sale order
             order = request.website.sale_get_order(force_create=True)
 
+            # Ensure order exists and is in draft state
+            if not order or order.state != "draft":
+                return request.redirect("/shop")
+
             # Add combo to cart
             if order.add_combo_to_cart(combo_id):
                 return request.redirect("/shop/cart")
             else:
                 return request.redirect("/shop")
 
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
+            # Log error for debugging
+            import logging
+
+            _logger = logging.getLogger(__name__)
+            _logger.error(f"Error adding combo to cart: {e}")
+            return request.redirect("/shop")
+        except Exception as e:
+            # Log unexpected errors
+            import logging
+
+            _logger = logging.getLogger(__name__)
+            _logger.error(f"Unexpected error in add_combo_to_cart: {e}")
             return request.redirect("/shop")
 
     @http.route("/shop/combos", type="http", auth="public", website=True)

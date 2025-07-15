@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Website Product Promotions",
-    "version": "17.0.1.0.0",
+    "version": "17.0.1.0.1",
     "category": "Website/eCommerce",
     "summary": "Product Combos, Upsell & Cross-sell for eCommerce",
     "description": """
@@ -19,6 +19,11 @@
         - Better customer experience
         - Flexible combo pricing
         - Automatic discount application
+        
+        Bug Fixes (v17.0.1.0.1):
+        - Fixed "Order Reference (order_id) field is mandatory" error
+        - Improved error handling for combo cart operations
+        - Enhanced stability for multiple combo scenarios
     """,
     "author": "Beemart",
     "website": "https://beemart.vn",
