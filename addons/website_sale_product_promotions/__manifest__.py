@@ -31,6 +31,8 @@
         "views/menu_views.xml",
         "views/product_views.xml",
         "views/recommendation_views.xml",
+        "views/fbt_rule_views.xml",
+        "views/website_fbt_templates.xml",
         "data/ir_cron.xml"
     ],
     "assets": {
@@ -39,9 +41,11 @@
             "website_sale_product_promotions/static/src/css/promotions.css",
             "website_sale_product_promotions/static/src/css/upsell_styles.css",
             "website_sale_product_promotions/static/src/css/upsell.css",
+            "website_sale_product_promotions/static/src/css/fbt_styles.css",
             "website_sale_product_promotions/static/src/js/combo_cart.js",
             "website_sale_product_promotions/static/src/js/combo_add_to_cart.js",
-            "website_sale_product_promotions/static/src/js/upsell_carousel.js"
+            "website_sale_product_promotions/static/src/js/upsell_carousel.js",
+            "website_sale_product_promotions/static/src/js/fbt_carousel.js",
         ]
     },
     "installable": True,

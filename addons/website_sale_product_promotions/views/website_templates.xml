@@ -292,6 +292,8 @@
             <t t-call="website_sale_product_promotions.product_combo_section"/>
             <!-- Sau đó gọi section upsell -->
             <t t-call="website_sale_product_promotions.product_upsell_section"/>
+            <!-- Cuối cùng gọi section fbt -->
+            <t t-call="website_sale_product_promotions.fbt_products_section"/>
         </xpath>
     </template>
 </odoo>
