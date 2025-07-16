@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cron job: Tự động cập nhật recommendation upsell cho tất cả sản phẩm mỗi ngày -->
+    <record id="ir_cron_generate_all_upsell_recommendations" model="ir.cron">
+        <field name="name">Generate All Upsell Recommendations</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="code">model.action_generate_all_upsell()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall">False</field>
+        <field name="active">True</field>
+    </record>
+    
+</odoo>
