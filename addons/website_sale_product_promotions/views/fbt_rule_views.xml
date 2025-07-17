@@ -41,7 +41,7 @@
             </form>
         </field>
     </record>
-    <menuitem id="menu_fbt_root" name="Frequently Bought Together" parent="sale.sale_menu_root"/>
+    <menuitem id="menu_fbt_root" name="Frequently Bought Together" parent="menu_product_promotions_root"/>
     <record id="action_fbt_rule" model="ir.actions.act_window">
         <field name="name">FBT Rules</field>
         <field name="res_model">website.fbt.rule</field>
