@@ -16,8 +16,8 @@
         - Cron tự động cập nhật recommendation
         - Tăng giá trị đơn hàng trung bình, trải nghiệm khách hàng tốt hơn
     """,
-    "author": "Beemart",
-    "website": "https://beemart.vn",
+    "author": "BeeSmartSolutions",
+    "website": "https://beetech.one/",
     "depends": [
         "website_sale",
         "sale_management",
