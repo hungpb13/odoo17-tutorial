@@ -8,50 +8,62 @@ import json
 
 class ComboController(WebsiteSale):
 
-    # @http.route(
-    #     "/shop/combo/add",
-    #     type="http",
-    #     auth="public",
-    #     methods=["POST"],
-    #     website=True,
-    #     csrf=False,
-    # )
-    # def add_combo_to_cart(self, combo_id, **kwargs):
-    #     """Add a complete combo to cart"""
-    #     try:
-    #         combo_id = int(combo_id)
-    #         combo = request.env["product.combo"].sudo().browse(combo_id)
+    @http.route(
+        "/shop/combo/add",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        website=True,
+        csrf=False,
+    )
+    def add_combo_to_cart(self, combo_id=None, **kwargs):
+        """Add a complete combo to cart"""
+        try:
+            if not combo_id:
+                return request.redirect("/shop")
 
-    #         if not combo.exists() or not combo.active:
-    #             return request.redirect("/shop")
+            combo_id = int(combo_id)
+            combo = request.env["product.combo"].sudo().browse(combo_id)
 
-    #         # Get or create sale order
-    #         order = request.website.sale_get_order(force_create=True)
+            if not combo.exists() or not combo.active:
+                return request.redirect("/shop")
 
-    #         # Ensure order exists and is in draft state
-    #         if not order or order.state != "draft":
-    #             return request.redirect("/shop")
+            # Get or create sale order
+            order = request.website.sale_get_order(force_create=True)
 
-    #         # Add combo to cart
-    #         if order.add_combo_to_cart(combo_id):
-    #             return request.redirect("/shop/cart")
-    #         else:
-    #             return request.redirect("/shop")
+            # Ensure order exists and is in draft state
+            if not order or order.state != "draft":
+                return request.redirect("/shop")
 
-    #     except (ValueError, TypeError) as e:
-    #         # Log error for debugging
-    #         import logging
+            # Add combo to cart using the method from website_product_promotions
+            if hasattr(order, "add_combo_to_cart") and order.add_combo_to_cart(
+                combo_id
+            ):
+                return request.redirect("/shop/cart")
+            else:
+                # Fallback: Add products individually
+                for combo_line in combo.combo_line_ids:
+                    if combo_line.product_id and combo_line.quantity > 0:
+                        order._cart_update(
+                            product_id=combo_line.product_id.id,
+                            add_qty=combo_line.quantity,
+                        )
+                return request.redirect("/shop/cart")
 
-    #         _logger = logging.getLogger(__name__)
-    #         _logger.error(f"Error adding combo to cart: {e}")
-    #         return request.redirect("/shop")
-    #     except Exception as e:
-    #         # Log unexpected errors
-    #         import logging
+        except (ValueError, TypeError) as e:
+            # Log error for debugging
+            import logging
 
-    #         _logger = logging.getLogger(__name__)
-    #         _logger.error(f"Unexpected error in add_combo_to_cart: {e}")
-    #         return request.redirect("/shop")
+            _logger = logging.getLogger(__name__)
+            _logger.error(f"Error adding combo to cart: {e}")
+            return request.redirect("/shop")
+        except Exception as e:
+            # Log unexpected errors
+            import logging
+
+            _logger = logging.getLogger(__name__)
+            _logger.error(f"Unexpected error in add_combo_to_cart: {e}")
+            return request.redirect("/shop")
 
     @http.route("/shop/combos", type="http", auth="public", website=True)
     def shop_combos(self, **kwargs):

@@ -39,10 +39,10 @@
                                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <input type="hidden" name="product_id" t-att-value="fbt_product.product_variant_id.id if fbt_product.product_variant_id else fbt_product.id"/>
                                     <input type="hidden" name="add_qty" value="1"/>
-                                    <button type="submit" class="fbt-card-btn js_add_cart_json"
+                                    <button type="submit" class="btn btn-primary mt-2"
                                         t-att-data-product-id="fbt_product.product_variant_id.id if fbt_product.product_variant_id else fbt_product.id"
                                         data-quantity="1">
-                                        Add to Cart
+                                        Add to cart
                                     </button>
                                 </form>
                             </div>

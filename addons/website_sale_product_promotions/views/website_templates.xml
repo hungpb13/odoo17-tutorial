@@ -236,7 +236,7 @@
                                     <form action="/shop/combo/add" method="post" class="mt-auto">
                                         <input type="hidden" name="combo_id" t-att-value="combo.id"/>
                                         <button type="submit" class="btn btn-outline-primary w-100 fw-bold">
-                                            Add Combo to Cart
+                                            Add combo to cart
                                         </button>
                                     </form>
                                 </div>
