@@ -48,6 +48,7 @@
             "website_sale_product_promotions/static/src/js/fbt_carousel.js",
         ]
     },
+    'images': ['static/description/banner.png'],
     "installable": True,
     "application": True,
     "license": "LGPL-3",

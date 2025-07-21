@@ -1,31 +1,53 @@
-# Website Sale Product Promotions
+# Website Sale Product Promotions (Odoo 17 & 18)
 
-Module này hợp nhất toàn bộ tính năng của:
+Enhance your Odoo eCommerce with powerful product promotion features including Combo Offers, Upsell, Cross-sell, and Frequently Bought Together suggestions.
 
-- `website_product_promotions`: Combo sản phẩm, upsell/cross-sell thủ công, khuyến mãi website
-- `product_upsell_auto`: Gợi ý upsell/cross-sell tự động, combo thông minh, recommendation
+## 🔑 Key Features
 
-## Tính năng nổi bật
+- ✅ **Create Product Combos**  
+  Define product combos with promotional prices. Automatically apply combo discounts when customers add all required products to cart.
 
-- Tạo combo sản phẩm với giá ưu đãi, tự động áp dụng khi khách mua đủ combo
-- Gợi ý upsell/cross-sell thủ công và tự động dựa trên dữ liệu
-- Giao diện đẹp cho website, backend quản lý dễ dàng
-- Cron tự động cập nhật recommendation
-- Tăng giá trị đơn hàng trung bình, trải nghiệm khách hàng tốt hơn
+- 🛒 **Manual Upsell/Cross-sell Suggestions**  
+  Set related upsell and cross-sell products manually for each product from the backend.
 
-## Cấu trúc thư mục
+- 🤖 **Smart Auto Upsell/Cross-sell**  
+  Automatically suggest relevant products based on sales history and intelligent rules.
 
-- models/: Toàn bộ models về combo, recommendation, product extension, sale order
-- controllers/: Controller xử lý combo, recommendation, API website
-- views/: Giao diện backend, frontend, website, assets
-- security/: Phân quyền truy cập
-- static/: CSS, JS cho website
-- data/: Cron jobs, dữ liệu mẫu
+- 🔄 **Frequently Bought Together (FBT)**  
+  Show products that are commonly purchased together directly on the product page.
 
-## Tác giả
+- 🌐 **Beautiful Website Integration**  
+  Attractive, responsive UI blocks for combos, upsells, cross-sells, and FBT to enhance the shopping experience.
 
-Beemart
+- 🛠️ **Easy Backend Management**  
+  Manage combos, rules, and suggested products through dedicated backend menus and views.
 
-## License
+- ⏱️ **Automatic Updates via Cron**  
+  A scheduled cron job keeps suggestion data fresh and up-to-date based on sales activity.
 
-LGPL-3
+- 💸 **Boost Average Order Value**  
+  Encourage additional purchases and drive more revenue through intelligent promotion strategies.
+
+## 🎯 Business Benefits
+
+- Improve product discoverability
+- Increase conversion rate and order value
+- Deliver a modern, Amazon-like shopping experience on your Odoo store
+
+## 📦 Technical Info
+
+- Compatible with **Odoo 17.0** and **Odoo 18.0**
+- Depends on: `website_sale`, `sale`, `stock`
+- License: **LGPL-3**
+
+## 🔧 Installation
+
+1. Copy the module to your custom addons folder
+2. Update the Apps list
+3. Install from the Apps menu
+
+## 🧑‍💻 Author & Maintainer
+
+Developed by BeeSmartSolutions
+Website: https://beetech.one/  
+License: LGPL-3.0
