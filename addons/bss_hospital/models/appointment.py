@@ -28,6 +28,10 @@ class HospitalAppointment(models.Model):
                 vals['reference'] = self.env['ir.sequence'].next_by_code('hospital.appointment')
         return super().create(val_list)
 
+    def _compute_display_name(self):
+        for record in self:
+            record.display_name = f"[{record.reference}] {record.patient_id.name}"
+
     def action_confirm(self):
         for record in self:
             record.state = 'confirmed'
