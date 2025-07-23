@@ -6,6 +6,7 @@ class HospitalAppointment(models.Model):
     _description = 'Hospital Appointment'
     _inherit = ['mail.thread']
     _rec_name = 'patient_id'
+    _rec_names_search = ['reference', 'patient_id']
 
     reference = fields.Char(string='Reference', default='New')
     patient_id = fields.Many2one('hospital.patient', string='Patient')
