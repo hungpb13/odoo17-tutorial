@@ -25,6 +25,7 @@
                     <group>
                         <group string="Basic Info">
                             <field name="gender"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
                         </group>   
                         <group string="Personal Info">
                             <field name="date_of_birth"/>
