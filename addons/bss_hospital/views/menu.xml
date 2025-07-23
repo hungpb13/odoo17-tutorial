@@ -10,6 +10,8 @@
 
     <menuitem id="menu_appointments" name="Appointments" parent="menu_frontdesk" action="action_hospital_appointment"/>
 
+    <menuitem id="menu_appointment_line" name="Appointment Lines" parent="menu_frontdesk" action="action_hospital_appointment_line"/>
+
     <menuitem id="menu_configuration" name="Configuration" parent="menu_hospital_root"/>
 
     <menuitem id="menu_patient_tags" name="Patient Tags" parent="menu_configuration" action="action_patient_tag"/>

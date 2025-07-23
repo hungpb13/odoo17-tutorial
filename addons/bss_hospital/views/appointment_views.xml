@@ -34,6 +34,12 @@
                         <field name="date"/>
                         <field name="note"/> 
                     </group>
+                    <field name="appointment_line_ids">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="quantity"/>
+                        </tree>
+                    </field>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" group="base.group_user"/>
