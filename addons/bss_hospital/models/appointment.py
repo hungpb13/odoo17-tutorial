@@ -25,6 +25,7 @@ class HospitalAppointment(models.Model):
         compute='_compute_total_quantity',
         store=True
     )
+    date_of_birth = fields.Date(string='Date of Birth', related='patient_id.date_of_birth')
 
     @api.model_create_multi
     def create(self, val_list):
