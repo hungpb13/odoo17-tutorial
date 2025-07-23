@@ -32,6 +32,7 @@
                         <field name="reference" readonly="True"/>
                         <field name="patient_id"/>
                         <field name="date"/>
+                        <field name="total_quantity"/>
                     </group>
                     <notebook>
                         <page name="appointment_lines" string="Lines">
