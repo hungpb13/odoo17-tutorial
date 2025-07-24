@@ -10,6 +10,7 @@
                 <field name="patient_id"/>
                 <field name="date" optional="show"/>
                 <field name="state"/>
+                <field name="create_uid" groups="bss_hospital.group_hospital_doctors"/>
                 <field name="note" optional="hide"/>
             </tree>
         </field>
@@ -34,6 +35,7 @@
                         <field name="date_of_birth" readonly="True"/>
                         <field name="date"/>
                         <field name="total_quantity"/>
+                        <field name="create_uid" groups="bss_hospital.group_hospital_doctors"/>
                     </group>
                     <notebook>
                         <page name="appointment_lines" string="Lines">

@@ -14,5 +14,11 @@
 
     <menuitem id="menu_configuration" name="Configuration" parent="menu_hospital_root"/>
 
-    <menuitem id="menu_patient_tags" name="Patient Tags" parent="menu_configuration" action="action_patient_tag"/>
+    <menuitem 
+        id="menu_patient_tags" 
+        name="Patient Tags" 
+        parent="menu_configuration" 
+        action="action_patient_tag"
+        groups="bss_hospital.group_hospital_doctors"
+    />
 </odoo>
