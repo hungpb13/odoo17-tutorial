@@ -16,3 +16,6 @@ class HospitalPatient(models.Model):
         'tag_id',
         string='Tags', tracking=True)
     
+    def unlink(self):
+        print("Super method called for unlink")
+        return super().unlink()
