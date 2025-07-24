@@ -1,4 +1,4 @@
-from odoo import models, fields, _
+from odoo import models, fields, _, api
 from odoo.exceptions import ValidationError
 
 class HospitalPatient(models.Model):
@@ -16,10 +16,18 @@ class HospitalPatient(models.Model):
         'tag_id',
         string='Tags', tracking=True)
     
-    def unlink(self):
+    # def unlink(self):
+    #     for record in self:
+    #         domain = [('patient_id', '=', record.id)]
+    #         appointments = self.env['hospital.appointment'].search(domain)
+    #         if appointments:
+    #             raise ValidationError(_("Cannot delete patient '%s' with already existing associated appointments." % record.name))
+    #     return super().unlink()
+    
+    @api.ondelete(at_uninstall=False)
+    def _check_patient_appointments(self):
         for record in self:
             domain = [('patient_id', '=', record.id)]
             appointments = self.env['hospital.appointment'].search(domain)
             if appointments:
-                raise ValidationError(_("Cannot delete patient '%s' with already existing associated appointments." % record.name))
-        return super().unlink()
+                raise ValidationError(_("You cannot delete patient '%s' because they have existing appointments." % record.name))
