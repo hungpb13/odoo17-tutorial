@@ -1,5 +1,5 @@
-from odoo import models, fields
-
+from odoo import models, fields, _
+from odoo.exceptions import ValidationError
 
 class HospitalPatient(models.Model):
     _name = 'hospital.patient'
@@ -17,5 +17,9 @@ class HospitalPatient(models.Model):
         string='Tags', tracking=True)
     
     def unlink(self):
-        print("Super method called for unlink")
+        for record in self:
+            domain = [('patient_id', '=', record.id)]
+            appointments = self.env['hospital.appointment'].search(domain)
+            if appointments:
+                raise ValidationError(_("Cannot delete patient '%s' with already existing associated appointments." % record.name))
         return super().unlink()
