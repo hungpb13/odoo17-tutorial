@@ -40,6 +40,27 @@
         </field>
     </record>
 
+    <record id="view_hospital_patient_readonly_search" model="ir.ui.view">
+        <field name="name">hospital.patient.readonly.search</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <search string="Patients">
+                <field name="name"/>
+                <field name="tag_ids"/>
+                <field name="date_of_birth"/>
+                <field name="gender"/>
+                <field name="guardian"/>
+                <filter name="male_patients" string="Male" domain="[('gender', '=', 'male')]"/>
+                <filter name="female_patients" string="Female" domain="[('gender', '=', 'female')]"/>
+                <group expand="1" string="Group By">
+                    <filter name="group_by_gender" string="Gender" context="{'group_by' : 'gender'}"/>
+                    <filter name="group_by_tags" string="Tags" context="{'group_by' : 'tag_ids'}"/>
+                    <filter name="group_by_is_minor" string="Is Minor" context="{'group_by' : 'is_minor'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="action_hospital_patient_readonly" model="ir.actions.act_window">
         <field name="name">View Patients</field>
         <field name="res_model">hospital.patient</field>
@@ -48,6 +69,7 @@
                                     (0,0,{'view_mode':'tree', 'view_id': ref('view_hospital_patient_readonly_tree')}),
                                     (0,0,{'view_mode':'form', 'view_id': ref('view_hospital_patient_readonly_form')}),
                                     ]"/>
+        <field name="search_view_id" ref="view_hospital_patient_readonly_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 View Patients

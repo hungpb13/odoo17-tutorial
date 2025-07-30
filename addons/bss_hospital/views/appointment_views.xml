@@ -61,6 +61,29 @@
         </field>
     </record>
 
+    <record id="view_hospital_appointment_search" model="ir.ui.view">
+        <field name="name">hospital.appointment.search</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <search string="Appointments">
+                <field name="reference" 
+                    filter_domain="['|', ('reference', 'ilike', self), ('patient_id', 'ilike', self)]"
+                    string="Reference or Patient"
+                />
+                <field name="reference"/>
+                <field name="patient_id"/>
+                <field name="state"/>
+                <group expand="1" string="Group By">
+                    <filter name="group_by_patient" string="Patient" context="{'group_by' : 'patient_id'}"/>
+                    <filter name="group_by_state" string="Status" context="{'group_by' : 'state'}"/>
+                </group>
+                <searchpanel>
+                    <field name="state" string="Status" enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
     <record id="action_hospital_appointment" model="ir.actions.act_window">
         <field name="name">Appointments</field>
         <field name="res_model">hospital.appointment</field>
