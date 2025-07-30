@@ -6,6 +6,7 @@
     "depends": [
         "mail",
         "product",
+        "account",
     ],
     "data": [
         "security/security.xml",
