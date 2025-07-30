@@ -30,7 +30,7 @@
                 </header>
                 <sheet>
                     <group string="Basic Info">
-                        <field name="reference" readonly="True"/>
+                        <field name="reference" readonly="True" invisible="reference == 'New'"/>
                         <field name="patient_id"/>
                         <field name="date_of_birth" readonly="True"/>
                         <field name="date"/>
