@@ -15,7 +15,11 @@ class HospitalPatient(models.Model):
         'patient_id',
         'tag_id',
         string='Tags', tracking=True)
-    
+    is_minor = fields.Boolean(string='Minor')
+    guardian = fields.Char(string='Guardian')
+    weight = fields.Float(string='Weight (kg)')
+
+
     # def unlink(self):
     #     for record in self:
     #         domain = [('patient_id', '=', record.id)]
