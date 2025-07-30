@@ -20,4 +20,7 @@
         "views/account_move_views.xml",
         "views/menu.xml",
     ],
+    'images': ['static/description/banner.jpg'],
+    "installable": True,
+    "application": True,
 }
